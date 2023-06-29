@@ -6,6 +6,7 @@ const sequelize = new Sequelize('clusters', 'test', '2023', {
   dialect: 'mysql',
 })
 
+// Create an instance of Sequelize and define the model
 const Clusters = sequelize.define('clusters', {
   name: {
     type: DataTypes.STRING,
@@ -18,6 +19,7 @@ const Clusters = sequelize.define('clusters', {
   },
 })
 
+// Sync the database and handle any errors
 sequelize
   .sync()
   .then(() => {
@@ -27,9 +29,11 @@ sequelize
     console.error('Error synchronizing database:', error)
   })
 
+// Create an Express app and enable JSON parsing
 const app = express()
 app.use(express.json())
 
+// Define the route to fetch all clusters
 app.get('/clusters', (req, res) => {
   Clusters.findAll()
     .then(clusters => {
@@ -41,6 +45,7 @@ app.get('/clusters', (req, res) => {
     })
 })
 
+// Define the route to create a new cluster
 app.post('/clusters', (req, res) => {
   const { name, percentage } = req.body
   Clusters.create({ name, percentage })
@@ -53,8 +58,7 @@ app.post('/clusters', (req, res) => {
     })
 })
 
-// Other routes...
-
+// Start the server
 app.listen(3000, () => {
   console.log('Server started on port 3000')
 })
