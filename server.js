@@ -1,5 +1,6 @@
 const express = require('express')
 const { Sequelize, DataTypes } = require('sequelize')
+const cors = require('cors')
 
 const sequelize = new Sequelize('clusters', 'test', '2023', {
   host: 'localhost',
@@ -32,6 +33,7 @@ sequelize
 // Create an Express app and enable JSON parsing
 const app = express()
 app.use(express.json())
+app.use(cors())
 
 // Define the route to fetch all clusters
 app.get('/clusters', (req, res) => {
