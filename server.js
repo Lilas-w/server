@@ -48,17 +48,50 @@ app.get('/clusters', (req, res) => {
 })
 
 // Define the route to create a new cluster
-app.post('/clusters', (req, res) => {
-  const { name, percentage } = req.body
-  Clusters.create({ name, percentage })
-    .then(cluster => {
-      res.json(cluster)
-    })
-    .catch(error => {
-      console.error('Error creating cluster:', error)
-      res.status(500).json({ error: 'Internal server error' })
-    })
-})
+// app.post('/clusters', (req, res) => {
+//   const { name, percentage } = req.body
+//   Clusters.create({ name, percentage })
+//     .then(cluster => {
+//       res.json(cluster)
+//     })
+//     .catch(error => {
+//       console.error('Error creating cluster:', error)
+//       res.status(500).json({ error: 'Internal server error' })
+//     })
+// })
+// ...
+
+// Define the route to create a new cluster
+app.post('/clusters', async (req, res) => {
+  try {
+    await Clusters.destroy({ truncate: true });
+    console.log('All records in the clusters table deleted');
+
+    const data = req.body;
+
+    if (!Array.isArray(data)) {
+      res.status(400).json({ error: 'Invalid data format. Expected an array.' });
+      return;
+    }
+
+    const createPromises = data.map(cluster => {
+      const { name, percentage } = cluster;
+      return Clusters.create({ name, percentage });
+    });
+
+    const createdClusters = await Promise.all(createPromises);
+
+    res.json(createdClusters);
+  } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      res.status(400).json({ error: 'Cluster name must be unique' });
+    } else {
+      console.error('Error creating clusters:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+});
+
 
 // Start the server
 app.listen(3000, () => {
