@@ -48,20 +48,6 @@ app.get('/clusters', (req, res) => {
 })
 
 // Define the route to create a new cluster
-// app.post('/clusters', (req, res) => {
-//   const { name, percentage } = req.body
-//   Clusters.create({ name, percentage })
-//     .then(cluster => {
-//       res.json(cluster)
-//     })
-//     .catch(error => {
-//       console.error('Error creating cluster:', error)
-//       res.status(500).json({ error: 'Internal server error' })
-//     })
-// })
-// ...
-
-// Define the route to create a new cluster
 app.post('/clusters', async (req, res) => {
   try {
     await Clusters.destroy({ truncate: true })
