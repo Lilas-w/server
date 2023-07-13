@@ -1,1 +1,1 @@
-GET http://localhost:3000/clusters
+GET http://localhost:3000/clusters/1689152056206689638
