@@ -1,92 +1,97 @@
-const express = require('express')
-const { Sequelize, DataTypes } = require('sequelize')
-const cors = require('cors')
+const express = require('express');
+const { Sequelize, DataTypes } = require('sequelize');
+const cors = require('cors');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
 
 const sequelize = new Sequelize('clusters', 'test', '2023', {
   host: 'localhost',
   dialect: 'mysql',
-})
+});
 
 // Create an instance of Sequelize and define the model
 const Clusters = sequelize.define('clusters', {
-  sessionID: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   name: {
     type: DataTypes.STRING,
     allowNull: true,
-    unique: true,
+    unique: false,
   },
   percentage: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-})
+  sessionId: {
+    type: DataTypes.STRING,
+    defaultValue: '',
+  },
+});
 
 // Sync the database and handle any errors
 sequelize
-  .sync({ force: true })
+  .sync()
   .then(() => {
-    console.log('Database synchronized')
+    console.log('Database synchronized');
   })
-  .catch(error => {
-    console.error('Error synchronizing database:', error)
-  })
+  .catch((error) => {
+    console.error('Error synchronizing database:', error);
+  });
 
 // Create an Express app and enable JSON parsing
-const app = express()
-app.use(express.json())
-app.use(cors())
+const app = express();
+app.use(express.json());
+app.use(
+  cors({
+    origin: 'http://localhost:3001', // Set the allowed origin
+    credentials: true, // Enable sending cookies and other credentials with the request
+  })
+);
+app.use(cookieParser());
 
-// Define the route to generate a session ID
-app.get('/session', (req, res) => {
-  const sessionID = generateSessionID()
+// Setup express-session middleware
+app.use(
+  session({
+    secret: '5c3dde296f96025304c4ed60ef06b5fc2b6584d2fd1d1595ff6a930d0f5b52e1',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }, // Set the cookie properties
+  })
+);
 
-  res.json({ sessionID })
-})
-
-// Define the route to fetch clusters for a specific session
-app.get('/clusters/:sessionID', (req, res) => {
-  const sessionID = req.params.sessionID
-
-  Clusters.findAll({ where: { sessionID } })
-    .then(clusters => {
-      res.json(clusters)
+// Define the route to fetch all clusters
+app.get('/clusters', (req, res) => {
+  const sessionId = req.session.id;
+  Clusters.findAll({ where: { sessionId } })
+    .then((clusters) => {
+      res.json(clusters);
     })
-    .catch(error => {
-      console.error('Error fetching clusters:', error)
-      res.status(500).json({ error: 'Internal server error' })
-    })
-})
+    .catch((error) => {
+      console.error('Error fetching clusters:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
 
-// Define the route to create a new cluster
 app.post('/clusters', async (req, res) => {
   try {
-    const { sessionID, data } = req.body;
+    const sessionId = req.session.id;
 
-    if (!sessionID || !Array.isArray(data)) {
-      res
-        .status(400)
-        .json({ error: 'Invalid request. Expected sessionID and data.' })
+    // Delete all records from the clusters table
+    await Clusters.destroy({ truncate: true });
+
+    console.log('All records in the clusters table deleted');
+
+    const data = req.body;
+
+    if (!Array.isArray(data)) {
+      res.status(400).json({ error: 'Invalid data format. Expected an array.' });
       return;
     }
 
-    await Clusters.destroy({ where: { sessionID } });
-    console.log(
-      `All records in the clusters table deleted for session: ${sessionID}`,
-    )
-
-    const createPromises = data.map(cluster => {
-      return Clusters.create({
-        sessionID,
-        name: cluster.name,
-        percentage: cluster.percentage,
-      });
+    const createPromises = data.map((cluster) => {
+      const { name, percentage } = cluster;
+      return Clusters.create({ name, percentage, sessionId });
     });
 
     const createdClusters = await Promise.all(createPromises);
-
     res.json(createdClusters);
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError') {
@@ -100,13 +105,5 @@ app.post('/clusters', async (req, res) => {
 
 // Start the server
 app.listen(3000, () => {
-  console.log('Server started on port 3000')
-})
-
-function generateSessionID() {
-  const timestamp = Date.now().toString()
-  const random = Math.floor(Math.random() * 1000000)
-    .toString()
-    .padStart(6, '0')
-  return timestamp + random
-}
+  console.log('Server started on port 3000');
+});
