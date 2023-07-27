@@ -1,14 +1,14 @@
-const express = require('express');
-const { Sequelize, DataTypes } = require('sequelize');
-const cors = require('cors');
-const session = require('express-session');
-const { v4: uuidv4 } = require('uuid');
-const MySQLStore = require('express-mysql-session')(session);
+const express = require('express')
+const { Sequelize, DataTypes } = require('sequelize')
+const cors = require('cors')
+const session = require('express-session')
+const { v4: uuidv4 } = require('uuid')
+const MySQLStore = require('express-mysql-session')(session)
 
 const sequelize = new Sequelize('clusters', 'test', '2023', {
   host: 'localhost',
   dialect: 'mysql',
-});
+})
 
 const Clusters = sequelize.define('clusters', {
   name: {
@@ -24,24 +24,24 @@ const Clusters = sequelize.define('clusters', {
     type: DataTypes.STRING,
     defaultValue: '',
   },
-});
+})
 
 sequelize
   .sync()
   .then(() => {
-    console.log('Database synchronized');
+    console.log('Database synchronized')
   })
-  .catch((error) => {
-    console.error('Error synchronizing database:', error);
-  });
+  .catch(error => {
+    console.error('Error synchronizing database:', error)
+  })
 
-const app = express();
-app.use(express.json());
+const app = express()
+app.use(express.json())
 
 // Custom session ID generator function
 const generateSessionId = () => {
-  return uuidv4();
-};
+  return uuidv4()
+}
 
 const sessionStore = new MySQLStore({
   db: sequelize,
@@ -50,7 +50,7 @@ const sessionStore = new MySQLStore({
   user: 'test',
   password: '2023',
   database: 'clusters',
-});
+})
 
 app.use(
   session({
@@ -63,16 +63,16 @@ app.use(
       maxAge: 86400000,
     },
     store: sessionStore,
-  })
-);
+  }),
+)
 
 // Enable CORS after setting up session middleware
 app.use(
   cors({
-    origin: 'http://localhost:3001', 
+    origin: 'http://localhost:3001',
     credentials: true, // Enable sending cookies and other credentials with the request
-  })
-);
+  }),
+)
 
 app.get('/clusters', async (req, res) => {
   try {
@@ -80,57 +80,57 @@ app.get('/clusters', async (req, res) => {
     const clusters = await Clusters.findAll({
       where: { sessionId: req.sessionID }, // Use req.sessionID to retrieve the session ID
     })
-    res.json(clusters);
+    res.json(clusters)
   } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data' });
+    console.error('Error fetching data:', error)
+    res.status(500).json({ error: 'An error occurred while fetching data' })
   }
-});
+})
 
 app.post('/clusters', async (req, res) => {
   try {
-    console.log('Received data from the client:', req.body);
-    const sessionId = req.sessionID; // Use req.sessionID to get the session ID
+    console.log('Received data from the client:', req.body)
+    const sessionId = req.sessionID // Use req.sessionID to get the session ID
 
     // Delete all records from the clusters table
-    await Clusters.destroy({ truncate: true });
+    await Clusters.destroy({ truncate: true })
 
-    console.log('All records in the clusters table deleted');
+    console.log('All records in the clusters table deleted')
 
-    const data = req.body;
+    const data = req.body
 
     if (!Array.isArray(data)) {
-      res.status(400).json({ error: 'Invalid data format. Expected an array.' });
-      return;
+      res.status(400).json({ error: 'Invalid data format. Expected an array.' })
+      return
     }
 
-    console.log('Received data:', data); // Add this log to see the data received from the client
+    console.log('Received data:', data) // Add this log to see the data received from the client
 
-    const createPromises = data.map((cluster) => {
-      const { name, percentage } = cluster;
-      return Clusters.create({ name, percentage, sessionId });
-    });
+    const createPromises = data.map(cluster => {
+      const { name, percentage } = cluster
+      return Clusters.create({ name, percentage, sessionId })
+    })
 
     Promise.all(createPromises)
-      .then((createdClusters) => {
-        console.log('Created clusters:', createdClusters); // Add this log to see the data that is saved to the database
-        res.json(createdClusters);
+      .then(createdClusters => {
+        console.log('Created clusters:', createdClusters) // Add this log to see the data that is saved to the database
+        res.json(createdClusters)
       })
-      .catch((error) => {
-        console.error('Error creating clusters:', error);
-        res.status(500).json({ error: 'Internal server error' });
-      });
+      .catch(error => {
+        console.error('Error creating clusters:', error)
+        res.status(500).json({ error: 'Internal server error' })
+      })
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError') {
-      res.status(400).json({ error: 'Cluster name must be unique' });
+      res.status(400).json({ error: 'Cluster name must be unique' })
     } else {
-      console.error('Error creating clusters:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      console.error('Error creating clusters:', error)
+      res.status(500).json({ error: 'Internal server error' })
     }
   }
-});
+})
 
 // Start the server
 app.listen(3000, () => {
-  console.log('Server started on port 3000');
-});
+  console.log('Server started on port 3000')
+})
