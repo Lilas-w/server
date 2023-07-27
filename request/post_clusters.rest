@@ -2,11 +2,11 @@ POST http://localhost:3000/clusters HTTP/1.1
 content-type: application/json
 
 [{
-    "name": "1",
+    "name": "2",
     "percentage": "10%"
 },
 {
-    "name": "2",
+    "name": "3",
     "percentage": "20%"
 }
 ]

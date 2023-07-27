@@ -123,7 +123,7 @@ debug@2.6.9:
   dependencies:
     ms "2.0.0"
 
-debug@^4.3.4:
+debug@4.3.4, debug@^4.3.4:
   version "4.3.4"
   resolved "https://registry.npmmirror.com/debug/-/debug-4.3.4.tgz#1319f6579357f2338d3337d2cdd4914bb5dcc865"
   integrity sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==
@@ -169,6 +169,14 @@ etag@~1.8.1:
   version "1.8.1"
   resolved "https://registry.npmmirror.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==
+
+express-mysql-session@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmmirror.com/express-mysql-session/-/express-mysql-session-3.0.0.tgz#933a671cb8dab340fdec05e69b8cee749a9c7d93"
+  integrity sha512-P+13IRUGC09HMSogHhuDKcWRofRuK9CQTSAgcheLemAEBYqzygv0mHRTQT/sdpFET6Zm6Zf8G+QsX8UdtDhKSA==
+  dependencies:
+    debug "4.3.4"
+    mysql2 "3.2.0"
 
 express-session@^1.17.3:
   version "1.17.3"
@@ -414,6 +422,20 @@ ms@2.1.3:
   resolved "https://registry.npmmirror.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
+mysql2@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.npmmirror.com/mysql2/-/mysql2-3.2.0.tgz#3613a8903bcb7ade0ae35b29945a0378eb67da89"
+  integrity sha512-0Vn6a9WSrq6fWwvPgrvIwnOCldiEcgbzapVRDAtDZ4cMTxN7pnGqCTx8EG32S/NYXl6AXkdO+9hV1tSIi/LigA==
+  dependencies:
+    denque "^2.1.0"
+    generate-function "^2.3.1"
+    iconv-lite "^0.6.3"
+    long "^5.2.1"
+    lru-cache "^7.14.1"
+    named-placeholders "^1.1.3"
+    seq-queue "^0.0.5"
+    sqlstring "^2.3.2"
+
 mysql2@^3.4.2:
   version "3.5.2"
   resolved "https://registry.npmmirror.com/mysql2/-/mysql2-3.5.2.tgz#a06050e1514e9ac15711a8b883ffd51cb44b2dc8"
@@ -658,6 +680,11 @@ uuid@^8.3.2:
   version "8.3.2"
   resolved "https://registry.npmmirror.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
+
+uuid@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.npmmirror.com/uuid/-/uuid-9.0.0.tgz#592f550650024a38ceb0c562f2f6aa435761efb5"
+  integrity sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==
 
 validator@^13.9.0:
   version "13.9.0"
