@@ -9,7 +9,7 @@ using standard HTTP methods (GET, POST) to perform actions on resources.
 To get started with the application, follow these steps:
 
 1. Clone the jbrowse-component repository:
-   `git clone https://github.com/your-repo-url.git`
+   `git clone https://github.com/Lilas-w/server`
 2. Navigate to the server submodule: `cd jbrowse-component/server`
 3. Install the dependencies: `npm install`
 4. Configure the MySQL database connection in the `server.js` file.
